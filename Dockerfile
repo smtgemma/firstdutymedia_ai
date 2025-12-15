@@ -1,31 +1,67 @@
-FROM python:3.10-slim
+# ⚠️ Replace:
+# PROJECT_ENTRY_POINT:app → e.g., myapp.main:app
 
-# Set environment variables
+
+
+
+
+
+
+
+
+# =========================
+# Builder stage
+# =========================
+FROM python:3.12-slim AS builder
+
 ENV PYTHONUNBUFFERED=1
-ENV PYTHONDONTWRITEBYTECODE=1
+ENV APP_HOME=/app
 
-# Install required packages and dependencies
+WORKDIR $APP_HOME
+
+# Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    libffi-dev \
     libssl-dev \
-    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory in the container
-WORKDIR /app
+# Copy requirements and install in /install
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --prefix=/install -r requirements.txt && \
+    pip install --no-cache-dir gunicorn
 
-# Copy requirements first to leverage Docker cache
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt gunicorn
+# Copy project source code
+COPY . .
 
-# Copy the app code into the container
-COPY . /app/
+# =========================
+# Final stage
+# =========================
+FROM python:3.12-slim
 
-# Remove any secrets that might have been copied and create directory for mounted secrets
-RUN rm -rf /app/etc/secrets/ && mkdir -p /app/etc/secrets
+ENV PYTHONUNBUFFERED=1
+ENV APP_HOME=/app
 
-# Expose port 8000 (Uvicorn will run here)
+WORKDIR $APP_HOME
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy installed packages from builder
+COPY --from=builder /install /usr/local
+COPY --from=builder $APP_HOME $APP_HOME
+
+
+
+# Expose FastAPI port
 EXPOSE 8000
 
-# Run the Uvicorn server
-# This path matches your actual project structure
-CMD ["gunicorn", "--config", "gunicorn_config.py", "com.mhire.app.main:app"]
+
+# Run Gunicorn with Uvicorn workers using external config
+
+# CMD ["gunicorn", "--config", "gunicorn_config.py", "com.mhire.app.main:app"]
+CMD ["gunicorn", "com.mhire.app.main:app", "-c", "gunicorn_config.py"]
