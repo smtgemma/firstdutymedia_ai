@@ -1,0 +1,132 @@
+# ===========================# Exclude secrets and credentials
+
+# Git & Version Controletc/secrets/
+
+# ===========================*.json
+
+.git/
+
+.gitignore# Exclude development files
+
+.gitattributes.git
+
+.gitignore
+
+# ===========================.env
+
+# IDE & Editor Filesvenv/
+
+# ===========================.venv/
+
+.vscode/__pycache__/
+
+.idea/*.pyc
+
+*.swp*.pyo
+
+*.swo*.pyd
+
+*~
+
+# Exclude documentation
+
+# ===========================README.md
+
+# Virtual Environments*.md
+
+# ===========================
+
+venv/# Exclude Docker files
+
+.venv/Dockerfile
+
+env/.dockerignore
+
+ENV/compose.yaml
+
+docker-compose.yml
+# ===========================
+# Python Cache & Compiled
+# ===========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+
+# ===========================
+# Environment Variables
+# ===========================
+.env
+.env.local
+.env.*.local
+
+# ===========================
+# Secrets & Credentials
+# ===========================
+etc/secrets/
+secrets/
+*.key
+*.pem
+
+# ===========================
+# Testing & Coverage
+# ===========================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+tests/
+
+# ===========================
+# Build & Distribution
+# ===========================
+build/
+dist/
+*.tar.gz
+*.zip
+
+# ===========================
+# Logs & Temporary Files
+# ===========================
+*.log
+logs/
+*.pid
+*.tmp
+*.bak
+
+# ===========================
+# Documentation
+# ===========================
+README.md
+*.md
+docs/
+
+# ===========================
+# Node/Frontend (if applicable)
+# ===========================
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# ===========================
+# Docker & Container Files
+# ===========================
+.dockerignore
+Dockerfile
+docker-compose.yml
+docker-compose.yaml
+compose.yaml
+
+# ===========================
+# Other Files & Directories
+# ===========================
+.DS_Store
+Thumbs.db
+others/
+.mypy_cache/
+.qodo/

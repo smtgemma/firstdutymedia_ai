@@ -1,0 +1,31 @@
+networks:
+  tedg-network:
+    driver: bridge
+services:
+  app:
+    build: .
+    container_name: bias_app2
+    expose:
+      - '8000'
+    env_file:
+      - .env
+    volumes:
+      # Mount your GCP service account JSON file from the project directory
+      # This assumes you've copied the JSON file to the project root
+      # - ./etc/secrets/build-ai-464207-d3c5fc844bb2.json:/app/etc/secrets/build-ai-464207-d3c5fc844bb2.json:ro
+      - ./etc/secrets/secret.json:/app/etc/secrets/secret.json:ro
+    networks:
+      - tedg-network
+    restart: unless-stopped
+  nginx:
+    image: nginx:alpine
+    container_name: bias_nginx2
+    ports:
+      - '5012:80'
+    networks:
+      - tedg-network
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+    restart: unless-stopped
