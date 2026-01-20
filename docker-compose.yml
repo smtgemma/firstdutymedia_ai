@@ -8,7 +8,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: app_first_duty
+    container_name: app_first_duty_ai
     expose:
       - "8000"
     networks:
@@ -35,9 +35,9 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: nginx_first_duty
+    container_name: nginx_first_duty_ai
     ports:
-      - "0.0.0.0:8022:80"
+      - "0.0.0.0:8025:80"
     networks:
       - app-network
     volumes:
