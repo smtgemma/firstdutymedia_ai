@@ -1,67 +1,48 @@
-# ⚠️ Replace:
-# PROJECT_ENTRY_POINT:app → e.g., myapp.main:app
+# Use Python slim image for smaller size
+FROM python:3.11-slim
 
+# Set working directory
+WORKDIR /app
 
-
-
-
-
-
-
-
-# =========================
-# Builder stage
-# =========================
-FROM python:3.12-slim AS builder
-
-ENV PYTHONUNBUFFERED=1
-ENV APP_HOME=/app
-
-WORKDIR $APP_HOME
-
-# Install build dependencies
+# Install system dependencies for Tesseract OCR
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    tesseract-ocr \
+    tesseract-ocr-eng \
+    libtesseract-dev \
+    # Add more languages if needed:
+    # tesseract-ocr-ben \
+    # tesseract-ocr-ara \
     build-essential \
+    libjpeg-dev \
+    libtiff-dev \
+    libgif-dev \
     gcc \
-    libffi-dev \
-    libssl-dev \
+    musl-dev \
+    net-tools \
     && rm -rf /var/lib/apt/lists/*
+    
 
-# Copy requirements and install in /install
-COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir --prefix=/install -r requirements.txt && \
-    pip install --no-cache-dir gunicorn
+# Verify Tesseract installation
+RUN tesseract --version
 
-# Copy project source code
-COPY . .
+# Copy requirements file
+COPY requirements.txt /app/
 
-# =========================
-# Final stage
-# =========================
-FROM python:3.12-slim
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-ENV PYTHONUNBUFFERED=1
-ENV APP_HOME=/app
+# Copy application code
+COPY . /app/
 
-WORKDIR $APP_HOME
-
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy installed packages from builder
-COPY --from=builder /install /usr/local
-COPY --from=builder $APP_HOME $APP_HOME
-
-
-
-# Expose FastAPI port
+# Expose port
 EXPOSE 8000
 
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
 
-# Run Gunicorn with Uvicorn workers using external config
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import requests; requests.get('http://localhost:8000/health')" || exit 1
 
-# CMD ["gunicorn", "--config", "gunicorn_config.py", "com.mhire.app.main:app"]
-CMD ["gunicorn", "com.mhire.app.main:app", "-c", "gunicorn_config.py"]
+# Run the application
+CMD ["uvicorn", "com.mhire.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
