@@ -48,7 +48,6 @@ venv.bak/venv.bak/
 
 # ===========================# ===========================
 
-.vscode/.vscode/
 
 .idea/.idea/
 
@@ -241,7 +240,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -291,7 +289,6 @@ cython_debug/
 #  that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
 #  and can be added to the global gitignore or merged into this file. However, if you prefer, 
 #  you could uncomment the following to ignore the enitre vscode folder
-# .vscode/
 
 # Ruff stuff:
 .ruff_cache/
@@ -307,3 +304,8 @@ cython_debug/
 .cursorindexingignore
 
 .qodo
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+config.bat
+node_modules
